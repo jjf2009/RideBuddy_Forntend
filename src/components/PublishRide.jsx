@@ -5,6 +5,7 @@ import 'leaflet/dist/leaflet.css';
 import 'leaflet-routing-machine/dist/leaflet-routing-machine.css';
 import 'leaflet-routing-machine';
 import PublishForm from "./PublishForm";
+import { getAuth } from "firebase/auth";
 
 const PublishRide = () => {
   const [submitSuccess, setSubmitSuccess] = useState(false);
@@ -15,6 +16,10 @@ const PublishRide = () => {
   const [routeDescription, setRouteDescription] = useState('');
   const [startLocation, setStartLocation] = useState('');
   const [endLocation, setEndLocation] = useState('');
+ 
+  //Getting user id 
+  const auth = getAuth();
+  const currentDriverId = auth.currentUser?.uid; 
 
   // Use the mutation hook from RTK Query
   const [addRide, { isLoading, error }] = useAddRideMutation();
@@ -146,20 +151,24 @@ const PublishRide = () => {
       // Convert string values to numbers where needed
       const rideData = {
         ...formData,
+        DriverId:currentDriverId,
+        year:parseInt(formData.year),
+        // year:parseInt(formData.age),
         drivingexp: parseInt(formData.experience),
         vehicle: formData.carModel,
-        price: parseFloat(formData.price),
+        price:parseInt(fare),
         seatsAvailable: parseInt(formData.seatsAvailable),
         phoneNumber: formData.phone,
         routeDescription: routeDescription,
       };
+      // console.log(rideData)
       
       // Use the mutation to send data to the API
       const response = await addRide(rideData).unwrap();
       
       setSubmitSuccess(true);
       
-      console.log("Ride created successfully:", response);
+      // console.log("Ride created successfully:", response);
       
       // Hide success message after 3 seconds
       setTimeout(() => {
@@ -167,7 +176,7 @@ const PublishRide = () => {
       }, 3000);
     } catch (err) {
       console.error("Error creating ride:", err);
-      alert(`Failed to create ride: ${err.message || "Unknown error"}`);
+      // alert(`Failed to create ride: ${err.message || "Unknown error"}`);
     }
   };
 

@@ -1,41 +1,37 @@
-
-import { Outlet } from 'react-router-dom'
-import './App.css'
-import Navbar from './components/Navbar'
-import Footer from './components/Footer'
-import { AuthProvider } from "./context/AuthContext"; 
-import { useEffect, useState } from 'react'
-import Loading from './components/Loading'
+import { Outlet } from 'react-router-dom';
+import './App.css';
+import Navbar from './components/Navbar';
+import Footer from './components/Footer';
+import { AuthProvider } from './context/AuthContext';
+import { useEffect, useState } from 'react';
+import Loading from './components/Loading';
 
 function App() {
-
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-
     const timer = setTimeout(() => {
       setLoading(false);
-    }, 2000); 
+    }, 2000);
 
-    // Cleanup timer
     return () => clearTimeout(timer);
   }, []);
 
   if (loading) {
-    return <Loading />; 
+    return <Loading />;
   }
 
-
   return (
-    <>
-      <AuthProvider>
+    <AuthProvider>
+      <div className="flex flex-col min-h-screen">
         <Navbar />
+        <main className="flex-grow">
           <Outlet />
+        </main>
         <Footer />
-      </AuthProvider>
-
-    </>
-  )
+      </div>
+    </AuthProvider>
+  );
 }
 
-export default App
+export default App;

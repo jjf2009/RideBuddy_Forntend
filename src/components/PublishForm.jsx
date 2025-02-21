@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
 const PublishForm = ({ 
@@ -8,7 +8,6 @@ const PublishForm = ({
   routeDescription, 
   submitSuccess,
   calculateFare,
-  routeCoordinates,
   setStartLocation,
   setEndLocation
 }) => {
@@ -16,8 +15,11 @@ const PublishForm = ({
     register,
     handleSubmit,
     formState: { errors },
-    watch
+    watch,
+    reset // Used to reset form after successful submission
   } = useForm();
+
+  const [showThankYou, setShowThankYou] = useState(false);
 
   // Watch form fields for location changes
   const startLocationValue = watch("startLocation");
@@ -36,8 +38,23 @@ const PublishForm = ({
     }
   }, [endLocationValue, setEndLocation]);
 
+  // Custom submit handler
+  const handleFormSubmit = (data) => {
+    onSubmit(data);
+    setShowThankYou(true);
+    setTimeout(() => {
+      setShowThankYou(false);
+      reset(); // Reset the form after showing the message
+    }, 3000); // Hide the message after 3 seconds
+  };
+
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+     <div>
+      {showThankYou ? (
+        <div className="mb-4 p-3 bg-green-200 text-green-800 text-center rounded">
+          🎉 Thank you for publishing your ride!
+        </div>
+      ) :<form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       {submitSuccess && (
         <div className="mb-4 p-2 bg-green-100 border border-green-400 text-green-700 rounded">
           Ride published successfully!
@@ -76,10 +93,10 @@ const PublishForm = ({
 
       {/* Year */}
       <div>
-        <label className="block text-gray-700">Year</label>
+        <label className="block text-gray-700">Year Student</label>
         <input
-          type="text"
-          {...register("year", { required: true })}
+          type="number"
+          {...register("year", { required: true, min: 1 ,max :4 })}
           className="border rounded w-full p-2"
           placeholder="Academic year"
         />
@@ -192,23 +209,6 @@ const PublishForm = ({
         {errors.phone && <p className="text-red-500 text-sm">Enter a valid 10-digit phone number</p>}
       </div>
 
-      {/* Price input - adding this back for API compatibility */}
-      <div>
-        <label className="block text-gray-700">Price</label>
-        <input
-          type="number"
-          step="0.01"
-          {...register("price", { 
-            required: true, 
-            min: 0,
-            valueAsNumber: true 
-          })}
-          className="border rounded w-full p-2"
-          placeholder="Enter price of the trip"
-        />
-        {errors.price && <p className="text-red-500 text-sm">{errors.price.type === 'min' ? 'Price cannot be negative' : 'This field is required'}</p>}
-      </div>
-
       {/* Fare Information */}
       {calculateFare && (
         <div>
@@ -238,6 +238,8 @@ const PublishForm = ({
         {isLoading ? 'Publishing...' : 'Publish Ride'}
       </button>
     </form>
+    }
+   </div>
   );
 };
 

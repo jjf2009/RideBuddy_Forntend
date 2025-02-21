@@ -1,12 +1,14 @@
-import { configureStore } from '@reduxjs/toolkit'
-import ridesApi from "./features/rides/ridesApi"
-import requestSlice from "./features/request/requestSlice" // Import the new slice
+import { configureStore } from '@reduxjs/toolkit';
+import ridesApi from "./features/rides/ridesApi";
+import requestsApi from "./features/request/requestsApi"; // Import the new request API
 
 export const store = configureStore({
   reducer: {
-    [ridesApi.reducerPath]: ridesApi.reducer, // ✅ Add API reducer properly
-    requests: requestSlice // Add request slice to Redux store
+    [ridesApi.reducerPath]: ridesApi.reducer, // ✅ API reducer
+    [requestsApi.reducerPath]: requestsApi.reducer, // ✅ API reducer for requests
   },
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat(ridesApi.middleware) // ✅ Only add API middleware
-})
+    getDefaultMiddleware().concat(ridesApi.middleware, requestsApi.middleware), // ✅ Add request API middleware
+});
+
+export default store;

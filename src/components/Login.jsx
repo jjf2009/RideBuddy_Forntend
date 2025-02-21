@@ -25,6 +25,16 @@ const Login = () => {
       console.error(error);
     }
   };
+  const handleGoogleSignIn = async () => {
+    try {
+      await signInWithGoogle();
+      alert("Login with Google successful!");
+      navigate("/"); // Redirect to home after successful login
+    } catch (error) {
+      setMessage("Google sign-in failed. Please try again.");
+      console.error(error);
+    }
+  };
 
   return (
     <div className="h-screen flex justify-center items-center bg-gray-100 px-4">
@@ -80,7 +90,7 @@ const Login = () => {
           {/* Google Login Button */}
           <button
             type="button"
-            onClick={signInWithGoogle}
+            onClick={handleGoogleSignIn}
             className="w-full flex items-center justify-center gap-2 bg-red-500 hover:bg-red-600 text-white font-semibold py-2 rounded-md transition duration-200"
           >
             <FaGoogle /> Sign in with Google

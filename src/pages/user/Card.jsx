@@ -1,12 +1,49 @@
 import React, { useState, useEffect, useRef } from "react";
-import { FaWhatsapp, FaMapMarkerAlt, FaCalendarAlt, FaClock, FaCar, FaUserAlt, FaRoute } from "react-icons/fa";
+import { FaMapMarkerAlt, FaCalendarAlt, FaClock, FaCar, FaUserAlt, FaRoute } from "react-icons/fa";
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import { getAuth } from "firebase/auth";
+import { useAddRideRequestMutation } from "../../redux/features/request/requestsApi";
 
 const Card = ({ ride }) => {
   const [showMap, setShowMap] = useState(false);
   const mapRef = useRef(null);
   const mapContainerRef = useRef(null);
+  const [addRideRequest, { isLoading, isSuccess, error }] = useAddRideRequestMutation();
+  const [showModal, setShowModal] = useState(false); // Modal state
+
+  useEffect(() => {
+    if (isSuccess) {
+      setShowModal(true);
+    }
+  }, [isSuccess]);
+
+  const removeUndefined = (obj) => {
+    return Object.fromEntries(Object.entries(obj).filter(([_, v]) => v !== undefined));
+  };
+  
+  const handleAddToRequest = async () => {
+    const auth = getAuth();
+    const currentDriverId = auth.currentUser?.uid;
+  
+    if (!currentDriverId) {
+      console.error("Error: User not authenticated!");
+      return;
+    }
+  
+    const cleanedRide = removeUndefined(ride); // ✅ Remove undefined fields
+  
+    // console.log(cleanedRide, { userId: currentDriverId });
+  
+    try {
+      await addRideRequest({
+        ...cleanedRide, // ✅ Ensure ride is properly structured
+        userId: currentDriverId,
+      });
+    } catch (error) {
+      console.error("Failed to send request:", error);
+    }
+  };
   
   // Format date function
   const formatDate = (dateString) => {
@@ -15,10 +52,10 @@ const Card = ({ ride }) => {
   };
   
   // Create WhatsApp message
-  const createWhatsAppMessage = () => {
-    const message = `Hello ${ride?.driverName}, I'm interested in your ride from ${ride?.startLocation} to ${ride?.endLocation} on ${ride?.date} at ${ride?.time}. Is it still available?`;
-    return encodeURIComponent(message);
-  };
+  // const createWhatsAppMessage = () => {
+  //   const message = `Hello ${ride?.driverName}, I'm interested in your ride from ${ride?.startLocation} to ${ride?.endLocation} on ${ride?.date} at ${ride?.time}. Is it still available?`;
+  //   return encodeURIComponent(message);
+  // };
   
   // Initialize map when showing it
   useEffect(() => {
@@ -179,16 +216,28 @@ const Card = ({ ride }) => {
         
         {/* Contact driver button */}
         <button
-          className="mt-3 flex items-center justify-center w-full font-sans font-bold text-center uppercase py-3 px-4 rounded-lg bg-green-600 text-white shadow-md hover:bg-green-700 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none transition-all text-sm"
+          className="mt-3 flex items-center justify-center w-full font-bold uppercase py-3 px-4 rounded-lg bg-green-600 text-white hover:bg-green-700 transition-all text-sm"
           type="button"
-          onClick={() => window.open(
-            `https://wa.me/+91${ride?.phoneNumber}?text=${createWhatsAppMessage()}`,
-            "_blank"
-          )}
+          onClick={handleAddToRequest}
+          disabled={isLoading}
         >
-          <FaWhatsapp className="inline-block mr-2" size={18} />
-          Contact Driver
+          {isLoading ? "Sending..." : "Send Request to Join Ride"}
         </button>
+         {/* Success Modal */}
+         {showModal && (
+          <div className="fixed inset-0 flex items-end justify-center bg-black bg-opacity-50">
+            <div className="bg-white rounded-t-lg shadow-lg p-4 w-full max-w-md">
+              <h2 className="text-lg font-semibold">Request Sent!</h2>
+              <p className="text-gray-600">Your request to join the ride has been successfully sent.</p>
+              <button
+                className="mt-3 w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition-all"
+                onClick={() => setShowModal(false)}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

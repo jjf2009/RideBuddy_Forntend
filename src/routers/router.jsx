@@ -8,6 +8,7 @@ import PublishRide from "../components/PublishRide.jsx"
 import NotFound from "../components/NotFound.jsx"
 import PrivateRoute from "./PrivateRoute.jsx"
 import SearchPage from "../pages/user/SearchPage.jsx"
+import RequestPage from "../pages/request/RequestPage.jsx"
 
 
 const router = createBrowserRouter([
@@ -34,6 +35,10 @@ const router = createBrowserRouter([
        {
         path: "/publish",
         element: <PrivateRoute><PublishRide/></PrivateRoute>
+       },
+       {
+        path: "/requests",
+        element: <PrivateRoute><RequestPage/></PrivateRoute>
        },
        {
         path: "*",

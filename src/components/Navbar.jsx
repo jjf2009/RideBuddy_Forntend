@@ -1,24 +1,22 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { Plus, UserRound } from "lucide-react";
+import { Plus, UserRound, Bell } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 
 const Navbar = () => {
- 
-
   const authContext = useAuth();
-  console.log("Auth Context:", authContext);  // ✅ Debugging line
+  // console.log("Auth Context:", authContext); // ✅ Debugging line
 
   if (!authContext) {
     console.error("useAuth() is returning undefined. Check AuthProvider.");
   }
 
   const { currentUser, logout } = authContext || {};
-  // // ✅ Corrected Redux state keys
-  // const reqride = useSelector((state) => state.ride.rideRequests.length);
-  // const reqbook = useSelector((state) => state.book.bookedRequests.length);
-  // // const currentUser = true;
-  // const logout = false;
+
+  // ✅ Get the number of ride requests from Redux
+  // const rideRequests = useSelector((state) => state.requests.rideRequests);
+  // const pendingRequests = rideRequests.filter((req) => req.status === "pending").length;
+
   return (
     <div className="navbar bg-base-200">
       <div className="navbar-start">
@@ -27,7 +25,7 @@ const Navbar = () => {
         </Link>
       </div>
 
-      <div className="navbar-center">
+      <div className="navbar-center flex gap-4">
         <Link to="/search" className="btn btn-ghost">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -52,7 +50,18 @@ const Navbar = () => {
         </Link>
       </div>
 
-      <div className="navbar-end">
+      <div className="navbar-end flex items-center gap-4">
+        {/* 🔔 Notification Icon with Badge */}
+        {/* <Link to="/requests" className="relative btn btn-ghost">
+          <Bell className="h-6 w-6" />
+          {pendingRequests > 0 && (
+            <span className="absolute top-0 right-0 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+              {pendingRequests}
+            </span>
+          )}
+        </Link> */}
+
+        {/* 👤 Profile Dropdown */}
         <div className="dropdown dropdown-end">
           <label tabIndex={0} className="btn btn-ghost btn-circle avatar">
             <UserRound className="h-6 w-6" />
@@ -64,12 +73,6 @@ const Navbar = () => {
               </li>
             ) : (
               <>
-                {/* <li>
-                  <Link to="/dashboard">Booked Requests: {reqbook}</Link>
-                </li>
-                <li>
-                  <Link to="/published_rides">Ride Requests: {reqride}</Link>
-                </li> */}
                 <li>
                   <button onClick={logout} className="text-error">
                     Logout
