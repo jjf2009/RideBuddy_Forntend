@@ -6,47 +6,59 @@ import {
     onAuthStateChanged, 
     signInWithEmailAndPassword, 
     signInWithPopup, 
-    signOut 
+    signOut, 
+    updateProfile 
 } from "firebase/auth";
 
 const AuthContext = createContext();
-
 export const useAuth = () => useContext(AuthContext);
-
 const googleProvider = new GoogleAuthProvider();
 
-// AuthProvider Component
-export const AuthProvider = ({ children }) => {   // ✅ Fixed name
+export const AuthProvider = ({ children }) => {
     const [currentUser, setCurrentUser] = useState(null);
     const [loading, setLoading] = useState(true);
 
     // Register User
-    const registerUser = async (email, password) => {
+    const registerUser = async (email, password, name) => {
         try {
-            return await createUserWithEmailAndPassword(auth, email, password);
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            await updateProfile(userCredential.user, { displayName: name });
+            setCurrentUser({ ...userCredential.user, displayName: name });
+            return userCredential;
         } catch (error) {
             console.error("Registration Error:", error.message);
-            throw error;
+            throw new Error(error.message);
         }
     };
 
     // Login User
     const loginUser = async (email, password) => {
         try {
-            return await signInWithEmailAndPassword(auth, email, password);
+            const userCredential = await signInWithEmailAndPassword(auth, email, password);
+            return userCredential;
         } catch (error) {
             console.error("Login Error:", error.message);
-            throw error;
+            throw new Error(error.message);
         }
     };
 
-    // Sign in with Google
+    // Google Sign-in
     const signInWithGoogle = async () => {
         try {
-            return await signInWithPopup(auth, googleProvider);
+            const userCredential = await signInWithPopup(auth, googleProvider);
+            const user = userCredential.user;
+
+            // Ensure displayName is set
+            if (!user.displayName) {
+                const defaultName = user.email.split("@")[0]; // Use email prefix as default name
+                await updateProfile(user, { displayName: defaultName });
+                setCurrentUser({ ...user, displayName: defaultName });
+            }
+
+            return userCredential;
         } catch (error) {
             console.error("Google Sign-in Error:", error.message);
-            throw error;
+            throw new Error(error.message);
         }
     };
 
@@ -54,12 +66,14 @@ export const AuthProvider = ({ children }) => {   // ✅ Fixed name
     const logout = async () => {
         try {
             await signOut(auth);
+            setCurrentUser(null);
         } catch (error) {
             console.error("Logout Error:", error.message);
+            throw new Error(error.message);
         }
     };
 
-    // Manage User Authentication State
+    // Track authentication state
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (user) => {
             setCurrentUser(user);
@@ -71,8 +85,7 @@ export const AuthProvider = ({ children }) => {   // ✅ Fixed name
 
     const value = { currentUser, loading, registerUser, loginUser, signInWithGoogle, logout };
 
-    // Don't render children until loading is done
-    if (loading) return null;
+    if (loading) return null; // Prevent rendering before auth state is resolved
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

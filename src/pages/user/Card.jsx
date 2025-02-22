@@ -3,31 +3,51 @@ import { FaMapMarkerAlt, FaCalendarAlt, FaClock, FaCar, FaUserAlt, FaRoute } fro
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { getAuth } from "firebase/auth";
-import { useAddRideRequestMutation } from "../../redux/features/request/requestsApi";
+import { useAddRideRequestMutation,useFetchAllRequestsQuery } from "../../redux/features/request/requestsApi";
 
 const Card = ({ ride }) => {
   const [showMap, setShowMap] = useState(false);
   const mapRef = useRef(null);
   const mapContainerRef = useRef(null);
   const [addRideRequest, { isLoading, isSuccess, error }] = useAddRideRequestMutation();
+  const { data: existingRequests= [] } = useFetchAllRequestsQuery();
   const [showModal, setShowModal] = useState(false); // Modal state
+  const [alreadyRequested, setAlreadyRequested] = useState(false);
+
+  const auth = getAuth();
+  const currentUserId = auth.currentUser?.uid;
+
+  useEffect(() => {
+    if (existingRequests && currentUserId) {
+      const hasRequested = existingRequests.some(
+        (req) => req.userId === currentUserId && req.rideId === ride.id
+      );
+      setAlreadyRequested(hasRequested);
+    }
+  }, [existingRequests, currentUserId, ride?.id]);
 
   useEffect(() => {
     if (isSuccess) {
       setShowModal(true);
+      setAlreadyRequested(true);
     }
   }, [isSuccess]);
 
   const removeUndefined = (obj) => {
-    return Object.fromEntries(Object.entries(obj).filter(([_, v]) => v !== undefined));
+    return Object.fromEntries(
+      Object.entries(obj).filter(([key, value]) => value !== undefined && key !== "id")
+    );
   };
   
   const handleAddToRequest = async () => {
-    const auth = getAuth();
-    const currentDriverId = auth.currentUser?.uid;
   
-    if (!currentDriverId) {
+    if (!currentUserId) {
       console.error("Error: User not authenticated!");
+      return;
+    }
+    
+    if (alreadyRequested) {
+      console.warn("User has already requested this ride.");
       return;
     }
   
@@ -38,7 +58,10 @@ const Card = ({ ride }) => {
     try {
       await addRideRequest({
         ...cleanedRide, // ✅ Ensure ride is properly structured
-        userId: currentDriverId,
+        userId: auth.currentUser?.uid,
+        requesterName:auth.currentUser.displayName,
+        profileImg :auth.currentUser.photoURL,
+        rideId: ride.id,
       });
     } catch (error) {
       console.error("Failed to send request:", error);
@@ -219,10 +242,9 @@ const Card = ({ ride }) => {
           className="mt-3 flex items-center justify-center w-full font-bold uppercase py-3 px-4 rounded-lg bg-green-600 text-white hover:bg-green-700 transition-all text-sm"
           type="button"
           onClick={handleAddToRequest}
-          disabled={isLoading}
-        >
-          {isLoading ? "Sending..." : "Send Request to Join Ride"}
-        </button>
+          disabled={isLoading || alreadyRequested}
+          >{alreadyRequested ? "Request Sent" : isLoading ? "Sending..." : "Send Request to Join Ride"}
+          </button>
          {/* Success Modal */}
          {showModal && (
           <div className="fixed inset-0 flex items-end justify-center bg-black bg-opacity-50">

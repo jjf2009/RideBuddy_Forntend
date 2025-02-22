@@ -2,20 +2,25 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { Plus, UserRound, Bell } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
+import { getAuth } from "firebase/auth";
+import { useFetchAllRequestsQuery } from "../redux/features/request/requestsApi";
 
 const Navbar = () => {
   const authContext = useAuth();
-  // console.log("Auth Context:", authContext); // ✅ Debugging line
-
-  if (!authContext) {
-    console.error("useAuth() is returning undefined. Check AuthProvider.");
-  }
-
   const { currentUser, logout } = authContext || {};
+  const { data: rideRequests = [], isLoading, isError } = useFetchAllRequestsQuery(undefined, {
+    pollingInterval: 10000, // Auto-fetch every 10 seconds
+  });
 
-  // ✅ Get the number of ride requests from Redux
-  // const rideRequests = useSelector((state) => state.requests.rideRequests);
-  // const pendingRequests = rideRequests.filter((req) => req.status === "pending").length;
+  const auth = getAuth();
+  const currentUserId = auth.currentUser?.uid;// ✅ Use auth context instead of Firebase directly
+
+  // Ensure `rideRequests` is always an array before filtering
+  const filteredRequests = rideRequests?.filter(
+    (request) => request.userId === currentUserId || request.DriverId === currentUserId
+  ) || [];
+
+  const pendingRequests = filteredRequests.length; // ✅ Declare variable safely
 
   return (
     <div className="navbar bg-base-200">
@@ -52,14 +57,14 @@ const Navbar = () => {
 
       <div className="navbar-end flex items-center gap-4">
         {/* 🔔 Notification Icon with Badge */}
-        {/* <Link to="/requests" className="relative btn btn-ghost">
+        <Link to="/requests" className="relative btn btn-ghost">
           <Bell className="h-6 w-6" />
           {pendingRequests > 0 && (
             <span className="absolute top-0 right-0 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
               {pendingRequests}
             </span>
           )}
-        </Link> */}
+        </Link>
 
         {/* 👤 Profile Dropdown */}
         <div className="dropdown dropdown-end">

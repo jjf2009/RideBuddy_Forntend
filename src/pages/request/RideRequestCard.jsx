@@ -1,75 +1,116 @@
 import { useState } from "react";
-import { useDispatch } from "react-redux";
-import {useUpdateRequestStatusMutation } from "../../redux/features/request/requestsApi";
+import { useUpdateRequestStatusMutation } from "../../redux/features/request/requestsApi";
+import { getAuth } from "firebase/auth";
 
 const RideRequestCard = ({ request }) => {
-    const dispatch = useDispatch();
-    const [loading, setLoading] = useState(null); // Track loading state
-    const [status, setStatus] = useState(request.status); // Track updated status
+    const [loading, setLoading] = useState(false);
+    const [status, setStatus] = useState(request.status);
 
+    const auth = getAuth();
+    const currentUserId = auth.currentUser?.uid;
+   
+
+
+    const isDriver = request.DriverId === currentUserId; // Check if current user is the driver
+    const isRequester = request.userId === currentUserId; // Check if current user made the request
+
+    const requesterName = request.requesterName || "User"; // Ensure we get the requester's name
+    const driverName = request.driverName || "Driver"; // Ensure we get the driver's name
+    const profileImg = request.profileImg || "https://via.placeholder.com/50"; // Default profile image
+    // console.log(isDriver )
+    // console.log(isRequester)
+    // console.log(profileImg)
+    // console.log(auth.currentUser)
+
+    const [updateRequestStatus] = useUpdateRequestStatusMutation();
+
+
+    // Handle Accept/Reject
     const handleAction = async (newStatus) => {
-        setLoading(newStatus); // Set loading state for button
+        setLoading(true);
         try {
-            await dispatch(useUpdateRequestStatusMutation({ requestId: request.id, status: newStatus }));
-            setStatus(newStatus); // Update UI with new status
+            await updateRequestStatus({
+                requestId: request.id,
+                status: newStatus,
+            }).unwrap();
+            setStatus(newStatus);
+            
         } catch (error) {
             console.error("Error updating request:", error);
         } finally {
-            setLoading(null);
+            setLoading(false);
         }
     };
-
     const isExpired = new Date(request.date) < new Date(); // Check if ride date is in the past
 
     return (
-        <div className="border rounded-lg p-4 shadow-md bg-white">
-            <div className="flex flex-col gap-2">
-                <h2 className="text-lg font-semibold">{request.driverName}</h2>
-                <p className="text-sm text-gray-500">{request.department}, Year {request.year}</p>
-                <hr className="my-2" />
-                <p><strong>From:</strong> {request.startLocation}</p>
-                <p><strong>To:</strong> {request.endLocation}</p>
-                <p><strong>Date:</strong> {request.date}</p>
-                <p><strong>Time:</strong> {request.time}</p>
-                <p><strong>Seats Available:</strong> {request.seatsAvailable}</p>
-                <p><strong>Price:</strong> ₹{request.price}</p>
-
-                {!isExpired ? (
-                    status === "pending" ? (
-                        <div className="flex gap-2 mt-4">
-                            <button
-                                onClick={() => handleAction("accepted")}
-                                className="btn btn-success"
-                                disabled={loading === "accepted"}
-                            >
-                                {loading === "accepted" ? "Accepting..." : "Accept"}
-                            </button>
-                            <button
-                                onClick={() => handleAction("rejected")}
-                                className="btn btn-error"
-                                disabled={loading === "rejected"}
-                            >
-                                {loading === "rejected" ? "Rejecting..." : "Reject"}
-                            </button>
-                        </div>
+        <div className="border rounded-lg p-4 shadow-md bg-white flex items-center justify-between w-full max-w-3xl mx-auto my-3">
+            <div className="flex items-center gap-4">
+                {isDriver && (
+                    <img src={profileImg} alt="Profile" className="w-12 h-12 rounded-full" />
+                )}
+                <div className="flex-1">
+                    {isDriver ? (
+                        <h2 className="text-lg font-semibold">Requester: {requesterName}</h2>
                     ) : (
-                        <p className={`mt-3 font-medium ${status === "accepted" ? "text-green-600" : "text-red-600"}`}>
-                            Request {status === "accepted" ? "Accepted ✅" : "Rejected ❌"}
-                        </p>
-                    )
+                        <h2 className="text-lg font-semibold">Driver: {driverName}</h2>
+                    )}
+                    <p className="text-sm text-gray-500">{request.date} | {request.time}</p>
+                    <p><strong>From:</strong> {request.startLocation}</p>
+                    <p><strong>To:</strong> {request.endLocation}</p>
+                    <p><strong>Price:</strong> ₹{request.price}</p>
+                </div>
+            </div>
+
+            { isDriver ? (
+                status === "pending" ? (
+                    <div className="flex gap-2">
+                        <button
+                            onClick={() => handleAction("accepted")}
+                            className="btn btn-success"
+                            disabled={loading}
+                        >
+                            {loading ? "Processing..." : "Accept"}
+                        </button>
+                        <button
+                            onClick={() => handleAction("rejected")}
+                            className="btn btn-error"
+                            disabled={loading}
+                        >
+                            {loading ? "Processing..." : "Reject"}
+                        </button>
+                    </div>
+                ) : status === "accepted" ? (
+                    <a
+                        href={`https://wa.me/${request.userPhone}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="btn btn-primary"
+                    >
+                        Contact Requester
+                    </a>
                 ) : (
+                    <p className="text-red-500 font-medium">Request Rejected ❌</p>
+                )
+            ) : isRequester ? (
+                status === "pending" ? (
+                    <p className="text-yellow-500 font-medium">Request Pending ⏳</p>
+                ) : status === "accepted" ? (
                     <a
                         href={`https://wa.me/${request.driverPhone}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="btn btn-primary mt-4"
+                        className="btn btn-primary"
                     >
                         Contact Driver
                     </a>
-                )}
-            </div>
+                ) : (
+                    <p className="text-red-500 font-medium">Request Rejected ❌</p>
+                )
+            ) : null}
         </div>
     );
 };
 
 export default RideRequestCard;
+
