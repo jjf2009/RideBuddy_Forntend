@@ -30,6 +30,7 @@ const PublishRide = () => {
     const petrolPrice = 96.62; // rupees per liter
     const litersNeeded = distanceInKm / fuelEfficiency;
     const calculatedFare = litersNeeded * petrolPrice;
+    calculateFare = calculateFare/parseInt(formData.seatsAvailable)
     setFare(calculatedFare);
     return calculatedFare;
   };
