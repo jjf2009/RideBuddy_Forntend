@@ -48,7 +48,7 @@ const Register = () => {
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           {/* Email Input */}
-          <div>
+          {/* <div>
             <label className="block text-gray-700 text-sm font-semibold mb-1">
               Email
             </label>
@@ -61,10 +61,10 @@ const Register = () => {
             {errors.email && (
               <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>
             )}
-          </div>
+          </div> */}
 
           {/* Password Input */}
-          <div>
+          {/* <div>
             <label className="block text-gray-700 text-sm font-semibold mb-1">
               Password
             </label>
@@ -77,20 +77,19 @@ const Register = () => {
             {errors.password && (
               <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>
             )}
-          </div>
+          </div> */}
 
           {/* Error Message */}
           {message && <p className="text-red-500 text-sm text-center">{message}</p>}
 
           {/* Register Button */}
-          <button
+          {/* <button
             type="submit"
             className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-md transition duration-200"
           >
             Register
-          </button>
-        </form>
-
+          </button> */}
+        
         {/* Google Sign-In Button */}
         <button
           onClick={handleGoogleSignIn}
@@ -98,6 +97,8 @@ const Register = () => {
         >
           <FaGoogle /> Sign up with Google
         </button>
+        </form>
+
 
         {/* Login Redirect */}
         <p className="text-center text-sm mt-4">

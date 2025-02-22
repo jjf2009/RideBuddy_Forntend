@@ -43,9 +43,9 @@ const Login = () => {
           RideBuddy Login
         </h2>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           {/* Email Input */}
-          <div>
+          {/* <div>
             <label className="block text-gray-700 text-sm font-semibold mb-1">
               Email
             </label>
@@ -61,7 +61,7 @@ const Login = () => {
           </div>
 
           {/* Password Input */}
-          <div>
+          {/* <div>
             <label className="block text-gray-700 text-sm font-semibold mb-1">
               Password
             </label>
@@ -74,18 +74,18 @@ const Login = () => {
             {errors.password && (
               <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>
             )}
-          </div>
+          </div> */}
 
           {/* Error Message */}
           {message && <p className="text-red-500 text-sm text-center">{message}</p>}
 
           {/* Login Button */}
-          <button
+          {/* <button
             type="submit"
             className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-md transition duration-200"
           >
             Login
-          </button>
+          </button>  */}
 
           {/* Google Login Button */}
           <button

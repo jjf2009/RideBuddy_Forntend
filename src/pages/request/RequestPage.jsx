@@ -4,7 +4,7 @@ import RideRequestCard from "./RideRequestCard";
 
 const RequestPage = () => {
     const { data: rideRequests = [], isLoading, isError } = useFetchAllRequestsQuery(undefined, {
-        pollingInterval: 10000, // Auto-fetch every 10 seconds
+        pollingInterval: 1000, // Auto-fetch every 10 seconds
       });
     
     // Get the current user's ID

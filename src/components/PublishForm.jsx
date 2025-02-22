@@ -38,15 +38,19 @@ const PublishForm = ({
     }
   }, [endLocationValue, setEndLocation]);
 
-  // Custom submit handler
-  const handleFormSubmit = (data) => {
-    onSubmit(data);
-    setShowThankYou(true);
-    setTimeout(() => {
-      setShowThankYou(false);
-      reset(); // Reset the form after showing the message
-    }, 3000); // Hide the message after 3 seconds
+  const handleFormSubmit = async (data) => {
+    try {
+      await onSubmit(data); // Ensure submission completes successfully
+      setShowThankYou(true);
+      setTimeout(() => {
+        setShowThankYou(false);
+        reset(); // Reset the form after showing the message
+      }, 3000);
+    } catch (err) {
+      console.error("Submission failed", err);
+    }
   };
+  
 
   return (
      <div>
@@ -54,7 +58,7 @@ const PublishForm = ({
         <div className="mb-4 p-3 bg-green-200 text-green-800 text-center rounded">
           🎉 Thank you for publishing your ride!
         </div>
-      ) :<form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      ) :<form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
       {submitSuccess && (
         <div className="mb-4 p-2 bg-green-100 border border-green-400 text-green-700 rounded">
           Ride published successfully!

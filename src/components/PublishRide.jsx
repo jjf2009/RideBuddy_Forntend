@@ -24,16 +24,16 @@ const PublishRide = () => {
   // Use the mutation hook from RTK Query
   const [addRide, { isLoading, error }] = useAddRideMutation();
 
-  // Helper function to calculate fare based on distance in km
-  const calculateFare = (distanceInKm) => {
+  // Helper function to calculate fare per seat based on distance in km
+  const calculateFare = (distanceInKm, numSeats) => {
     const fuelEfficiency = 15; // assumed km per liter
     const petrolPrice = 96.62; // rupees per liter
     const litersNeeded = distanceInKm / fuelEfficiency;
-    const calculatedFare = litersNeeded * petrolPrice;
-    calculateFare = calculateFare/parseInt(formData.seatsAvailable)
-    setFare(calculatedFare);
-    return calculatedFare;
+    const totalFare = litersNeeded * petrolPrice;
+    setFare(totalFare);
+    return totalFare ;
   };
+  
   
   // Initialize map once component mounts
   useEffect(() => {
@@ -140,7 +140,7 @@ const PublishRide = () => {
       console.error("Error updating route:", err);
     }
   }, [startLocation, endLocation]);
-
+  
   const onSubmit = async (formData) => {
     try {
       // Ensure we have route information before submission
@@ -148,13 +148,14 @@ const PublishRide = () => {
         alert("Please wait for route calculation to complete");
         return;
       }
-
+      const numSeats = parseInt(formData.seatsAvailable) || 1;
+      console.log("Number of Seats:",numSeats)
+      const perPersonFare = calculateFare(fare, numSeats);
       // Convert string values to numbers where needed
       const rideData = {
         ...formData,
         DriverId:currentDriverId,
         year:parseInt(formData.year),
-        // year:parseInt(formData.age),
         drivingexp: parseInt(formData.experience),
         vehicle: formData.carModel,
         price:parseInt(fare),
@@ -162,7 +163,8 @@ const PublishRide = () => {
         phoneNumber: formData.phone,
         routeDescription: routeDescription,
       };
-      // console.log(rideData)
+      console.log(formData)
+      console.log(rideData)
       
       // Use the mutation to send data to the API
       const response = await addRide(rideData).unwrap();

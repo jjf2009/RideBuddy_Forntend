@@ -82,7 +82,7 @@ const RideRequestCard = ({ request }) => {
                     </div>
                 ) : status === "accepted" ? (
                     <a
-                        href={`https://wa.me/${request.userPhone}`}
+                        href={`https://wa.me/${request.phoneNumber}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="btn btn-primary"
@@ -97,7 +97,7 @@ const RideRequestCard = ({ request }) => {
                     <p className="text-yellow-500 font-medium">Request Pending ⏳</p>
                 ) : status === "accepted" ? (
                     <a
-                        href={`https://wa.me/${request.driverPhone}`}
+                        href={`https://wa.me/${request.phoneNumber}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="btn btn-primary"
