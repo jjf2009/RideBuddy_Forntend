@@ -1,17 +1,17 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
-import getBaseUrl from '../../../utils/baseURL'
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import getBaseUrl from '../../../utils/baseURL';
 
-const  baseQuery = fetchBaseQuery({
+const baseQuery = fetchBaseQuery({
     baseUrl: `${getBaseUrl()}`,
-})
+});
 
 const ridesApi = createApi({
-    reducerPath:'ridesApi',
+    reducerPath: 'ridesApi',
     baseQuery,
-    tagTypes:["Rides"],
-    endpoints:(builder) =>({
-        fetchAllRides : builder.query({
-            query: ()=>"/search",
+    tagTypes: ["Rides"],
+    endpoints: (builder) => ({
+        fetchAllRides: builder.query({
+            query: () => "/search",
             providesTags: ["Rides"]
         }),
         fetchRideById: builder.query({
@@ -19,16 +19,36 @@ const ridesApi = createApi({
             providesTags: (result, error, id) => [{ type: "Rides", id }],
         }),
         addRide: builder.mutation({
-            query: (newBook) => ({
-                url: `/publish`,
+            query: (newRide) => ({
+                url: "/publish",
                 method: "POST",
-                body: newBook
+                body: newRide
+            }),
+            invalidatesTags: ["Rides"]
+        }),
+        updateRide: builder.mutation({
+            query: ({ id, updatedData }) => ({
+                url: `/update/${id}`,
+                method: "PUT",
+                body: updatedData
+            }),
+            invalidatesTags: (result, error, { id }) => [{ type: "Rides", id }],
+        }),
+        deleteRide: builder.mutation({
+            query: (id) => ({
+                url: `/delete/${id}`,
+                method: "DELETE"
             }),
             invalidatesTags: ["Rides"]
         }),
     })
+});
 
-})
-
-export const {useFetchAllRidesQuery, useFetchRideByIdQuery, useAddRideMutation,} = ridesApi;
+export const { 
+    useFetchAllRidesQuery, 
+    useFetchRideByIdQuery, 
+    useAddRideMutation, 
+    useUpdateRideMutation, 
+    useDeleteRideMutation 
+} = ridesApi;
 export default ridesApi;
