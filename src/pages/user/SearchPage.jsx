@@ -92,9 +92,12 @@ const SearchPage = () => {
           <h2 className="text-2xl font-semibold mb-4">Available Rides</h2>
           
           <Swiper
-            slidesPerView={3}
+            breakpoints={{
+              320: { slidesPerView: 1, spaceBetween: 10 },
+              640: { slidesPerView: 2, spaceBetween: 20 },
+              1024: { slidesPerView: 3, spaceBetween: 30 }
+            }}
             grid={{ rows: 3, fill: "row" }}
-            spaceBetween={30}
             navigation={true}
             pagination={{ clickable: true }}
             modules={[Pagination, Navigation, Grid]}
