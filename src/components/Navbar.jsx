@@ -1,122 +1,105 @@
-import React, { useState, useEffect } from "react";
-import Search from "./Search";
-import Card from "./Card";
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { Pagination, Navigation, Grid } from 'swiper/modules';
-import 'swiper/css';
-import 'swiper/css/pagination';
-import 'swiper/css/navigation';
-import 'swiper/css/grid';
-import { useFetchAllRidesQuery } from "../../redux/features/rides/ridesApi";
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
+import { Plus, UserRound, Menu } from "lucide-react";
+import { useAuth } from "../context/AuthContext";
 
-const SearchPage = () => {
-  const { data: rides = [], isLoading, isError } = useFetchAllRidesQuery();
-  const [searchParams, setSearchParams] = useState(null);
-  const [filteredRides, setFilteredRides] = useState([]);
-
-  const handleSearch = (formData) => {
-    if (!formData) {
-      setFilteredRides([]);
-      setSearchParams(null);
-      return;
-    }
-
-    let hasSearchCriteria = false;
-    const searchStartLocation = formData.startLocation?.toLowerCase().trim() || '';
-    const searchEndLocation = formData.endLocation?.toLowerCase().trim() || '';
-    const searchRoute = formData.route || null;
-    
-    if (searchStartLocation !== '' || searchEndLocation !== '') {
-      hasSearchCriteria = true;
-    } else {
-      setFilteredRides([]);
-      setSearchParams(null);
-      return;
-    }
-
-    const results = rides.filter(ride => {
-      if (!ride || (!ride.startLocation && !ride.endLocation)) {
-        return false;
-      }
-      
-      const rideStartLocation = (ride.startLocation || '').toLowerCase();
-      const rideEndLocation = (ride.endLocation || '').toLowerCase();
-      
-      let startMatch = true;
-      let endMatch = true;
-      
-      if (searchStartLocation !== '') {
-        startMatch = rideStartLocation.includes(searchStartLocation);
-      }
-      
-      if (searchEndLocation !== '') {
-        endMatch = rideEndLocation.includes(searchEndLocation);
-      }
-      
-      return startMatch && endMatch;
-    });
-    
-    setFilteredRides(results);
-    setSearchParams({
-      ...formData,
-      hasRouteData: !!searchRoute
-    });
-  };
-
-  useEffect(() => {}, [rides]);
-
-  const displayRides = searchParams ? filteredRides : rides;
-
-  if (isLoading) {
-    return <div className="container mx-auto p-4 text-center">Loading rides...</div>;
-  }
-
-  if (isError) {
-    return <div className="container mx-auto p-4 text-center text-red-500">Error loading rides. Please try again later.</div>;
-  }
+const Navbar = () => {
+  const [isOpen, setIsOpen] = useState(false);
+  const authContext = useAuth();
+  const { currentUser, logout } = authContext || {};
 
   return (
-    <div className="container mx-auto p-4">
-      <div className="mb-8">
-        <Search onSearch={handleSearch} />
+    <nav className="bg-base-200 p-4">
+      <div className="container mx-auto flex justify-between items-center">
+        {/* Left: Brand */}
+        <Link to="/" className="text-xl font-bold">
+          RideBuddy
+        </Link>
+
+        {/* Mobile Menu Button */}
+        <button
+          className="lg:hidden btn btn-ghost"
+          onClick={() => setIsOpen(!isOpen)}
+        >
+          <Menu className="h-6 w-6" />
+        </button>
+
+        {/* Desktop Menu */}
+        <div className="hidden lg:flex gap-4">
+          <Link to="/search" className="btn btn-ghost flex items-center">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
+            </svg>
+            <span className="ml-2">Search</span>
+          </Link>
+
+          <Link to="/publish" className="btn btn-ghost flex items-center">
+            <Plus className="h-5 w-5" />
+            <span className="ml-2">Publish a Ride</span>
+          </Link>
+        </div>
+
+        {/* Profile Dropdown */}
+        <div className="hidden lg:block">
+          <div className="dropdown dropdown-end">
+            <label tabIndex={0} className="btn btn-ghost btn-circle avatar">
+              <UserRound className="h-6 w-6" />
+            </label>
+            <ul
+              tabIndex={0}
+              className="menu dropdown-content menu-sm mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52"
+            >
+              {!currentUser ? (
+                <li>
+                  <Link to="/login">Login</Link>
+                </li>
+              ) : (
+                <>
+                  <li>
+                    <button onClick={logout} className="text-error">
+                      Logout
+                    </button>
+                  </li>
+                </>
+              )}
+            </ul>
+          </div>
+        </div>
       </div>
-      
-      {searchParams && filteredRides.length === 0 && (
-        <div className="text-center py-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-          <p className="text-yellow-700">No matching rides found. Try adjusting your search.</p>
+
+      {/* Mobile Menu */}
+      {isOpen && (
+        <div className="lg:hidden flex flex-col mt-4 space-y-2">
+          <Link to="/search" className="btn btn-ghost">
+            Search
+          </Link>
+          <Link to="/publish" className="btn btn-ghost">
+            Publish a Ride
+          </Link>
+          {!currentUser ? (
+            <Link to="/login" className="btn btn-ghost">
+              Login
+            </Link>
+          ) : (
+            <button onClick={logout} className="btn btn-error">
+              Logout
+            </button>
+          )}
         </div>
       )}
-      
-      {displayRides.length > 0 ? (
-        <div className="mt-6">
-          <h2 className="text-2xl font-semibold mb-4">Available Rides</h2>
-          
-          <Swiper
-            breakpoints={{
-              320: { slidesPerView: 1, spaceBetween: 10 },
-              640: { slidesPerView: 2, spaceBetween: 20 },
-              1024: { slidesPerView: 3, spaceBetween: 30 }
-            }}
-            grid={{ rows: 3, fill: "row" }}
-            navigation={true}
-            pagination={{ clickable: true }}
-            modules={[Pagination, Navigation, Grid]}
-            className="mySwiper"
-          >
-            {displayRides.map((ride, index) => (
-              <SwiperSlide key={ride.id || index}>
-                <Card ride={ride} />
-              </SwiperSlide>
-            ))}
-          </Swiper>
-        </div>
-      ) : (
-        <div className="text-center py-8">
-          <p className="text-gray-600">No rides available at the moment. Check back later!</p>
-        </div>
-      )}
-    </div>
+    </nav>
   );
 };
 
-export default SearchPage;
+export default Navbar;
