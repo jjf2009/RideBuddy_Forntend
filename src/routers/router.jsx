@@ -44,14 +44,6 @@ const router = createBrowserRouter(
           ),
         },
         {
-          path: "/requests",
-          element: (
-            <PrivateRoute>
-              <RequestPage />
-            </PrivateRoute>
-          ),
-        },
-        {
           path: "*",
           element: <NotFound />,
         },
