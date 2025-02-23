@@ -8,7 +8,8 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "postinstall": "cp dist/index.html dist/404.html"
+    "postinstall": "npm run build && cp build/index.html build/404.html"
+
     
   },
   "dependencies": {
