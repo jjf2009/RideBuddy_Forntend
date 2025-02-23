@@ -9,7 +9,8 @@ const PublishForm = ({
   submitSuccess,
   calculateFare,
   setStartLocation,
-  setEndLocation
+  setEndLocation,
+  setSeatsAvailable
 }) => {
   const {
     register,
@@ -24,6 +25,8 @@ const PublishForm = ({
   // Watch form fields for location changes
   const startLocationValue = watch("startLocation");
   const endLocationValue = watch("endLocation");
+  const SeatsAvailableValue = watch("seatsAvailable");
+
 
   // Update parent component with location values when they change
   useEffect(() => {
@@ -37,7 +40,11 @@ const PublishForm = ({
       setEndLocation(endLocationValue);
     }
   }, [endLocationValue, setEndLocation]);
-
+  useEffect(() => {
+    if (SeatsAvailableValue) {
+      setSeatsAvailable(SeatsAvailableValue);
+    }
+  }, [SeatsAvailableValue,setSeatsAvailable]);
   const handleFormSubmit = async (data) => {
     try {
       await onSubmit(data); // Ensure submission completes successfully
