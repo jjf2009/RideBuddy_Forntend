@@ -7,7 +7,9 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "postinstall": "cp dist/index.html dist/404.html"
+    
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.1.0",
