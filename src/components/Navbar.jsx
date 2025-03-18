@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { Plus, UserRound, Menu } from "lucide-react";
+import { Plus, UserRound, Menu,Contact } from "lucide-react";
+
 import { useAuth } from "../context/AuthContext";
 
 const Navbar = () => {
@@ -48,6 +49,11 @@ const Navbar = () => {
             <Plus className="h-5 w-5" />
             <span className="ml-2">Publish a Ride</span>
           </Link>
+          <Link to="mailto:jaredfurtadowork@gmail.com" className="btn btn-ghost flex items-center">
+  <Contact  className="h-5 w-5" />
+  <span className="ml-2">Contact Us</span>
+</Link>
+
         </div>
 
         {/* Profile Dropdown */}
@@ -62,7 +68,7 @@ const Navbar = () => {
             >
               {!currentUser ? (
                 <li>
-                  <Link to="/login">Login</Link>
+                  <Link to="/register">Login</Link>
                 </li>
               ) : (
                 <>

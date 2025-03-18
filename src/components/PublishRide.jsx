@@ -17,7 +17,6 @@ const PublishRide = () => {
   const [routeDescription, setRouteDescription] = useState('');
   const [startLocation, setStartLocation] = useState('');
   const [endLocation, setEndLocation] = useState('');
-
   const auth = getAuth();
   const currentDriverId = auth.currentUser?.uid;
   const [addRide, { isLoading, error }] = useAddRideMutation();
@@ -114,8 +113,8 @@ const PublishRide = () => {
       year: parseInt(formData.year, 10),
       drivingexp: parseInt(formData.experience, 10),
       vehicle: formData.carModel,
-      price: perPersonFare.toFixed(2) ? parseFloat(perPersonFare) : 0,  // Ensure price is a number
-      seatsAvailable: seatsAvailable ? parseInt(seatsAvailable, 10) : 0,  // Ensure seatsAvailable is a number
+      seatsAvailable: Number(formData.seatsAvailable),  // Convert to number
+      price: Number(formData.price),  // Ensure seatsAvailable is a number
       phoneNumber: formData.phone,
       routeDescription,
     };
@@ -132,27 +131,31 @@ const PublishRide = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-md">
+    <div className="grid grid-cols-3 gap-6 ">
+    {/* Form Section (Column 1) */}
+    <div className="bg-white p-6">
       <h2 className="text-2xl font-semibold mb-4">Publish a Ride</h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <PublishForm 
-          onSubmit={onSubmit}
-          isLoading={isLoading}
-          error={error}
-          routeDescription={routeDescription}
-          submitSuccess={submitSuccess}
-          calculateFare={perPersonFare}
-          setStartLocation={setStartLocation}
-          setEndLocation={setEndLocation}
-          setSeatsAvailable={setSeatsAvailable}
-        />
-        <div className="h-full">
-          <label className="block text-gray-700 font-medium">Select Your Route</label>
-          <p className="text-sm text-gray-500">Enter start and end locations, then customize your route.</p>
-          <div ref={mapContainerRef} className="h-96 rounded-lg border border-gray-300 overflow-hidden" />
-        </div>
-      </div>
+      <PublishForm 
+        onSubmit={onSubmit}
+        isLoading={isLoading}
+        error={error}
+        routeDescription={routeDescription}
+        submitSuccess={submitSuccess}
+        calculateFare={perPersonFare}
+        setStartLocation={setStartLocation}
+        setEndLocation={setEndLocation}
+        setSeatsAvailable={setSeatsAvailable}
+      />
     </div>
+  
+    {/* Map Section (Spanning Columns 2 and 3) */}
+    <div className="h-full w-full col-span-2">
+      <label className="block text-gray-700 font-medium">Select Your Route</label>
+      <p className="text-sm text-gray-500">Enter start and end locations, then customize your route.</p>
+      <div ref={mapContainerRef} className="h-[calc(100vh-100px)] w-full rounded-lg border border-gray-300 overflow-hidden" />
+    </div>
+  </div>
+  
   );
 };
 

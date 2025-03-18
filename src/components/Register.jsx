@@ -16,16 +16,16 @@ const Register = () => {
   } = useForm();
 
   // Register User
-  const onSubmit = async (data) => {
-    try {
-      await registerUser(data.email, data.password);
-      alert("User registered successfully!");
-      navigate("/"); // Redirect after successful registration
-    } catch (error) {
-      setMessage("Please provide a valid email and password");
-      console.error(error);
-    }
-  };
+  // const onSubmit = async (data) => {
+  //   try {
+  //     await registerUser(data.email, data.password);
+  //     alert("User registered successfully!");
+  //     navigate("/"); // Redirect after successful registration
+  //   } catch (error) {
+  //     setMessage("Please provide a valid email and password");
+  //     console.error(error);
+  //   }
+  // };
 
   // Google Sign-In
   const handleGoogleSignIn = async () => {
@@ -46,7 +46,7 @@ const Register = () => {
           RideBuddy Registration
         </h2>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        {/* <form onSubmit={handleSubmit(onSubmit)} className="space-y-4"> */}
           {/* Email Input */}
           {/* <div>
             <label className="block text-gray-700 text-sm font-semibold mb-1">
@@ -97,16 +97,16 @@ const Register = () => {
         >
           <FaGoogle /> Sign up with Google
         </button>
-        </form>
+        {/* </form> */}
 
 
         {/* Login Redirect */}
-        <p className="text-center text-sm mt-4">
+        {/* <p className="text-center text-sm mt-4">
           Already have an account?{" "}
           <Link to="/login" className="text-blue-500 hover:underline">
             Login
           </Link>
-        </p>
+        </p> */}
 
         {/* Footer */}
         <p className="text-center text-xs text-gray-500 mt-5">

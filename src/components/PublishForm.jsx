@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
+
 const PublishForm = ({ 
   onSubmit, 
   isLoading, 
@@ -21,6 +22,7 @@ const PublishForm = ({
   } = useForm();
 
   const [showThankYou, setShowThankYou] = useState(false);
+  
 
   // Watch form fields for location changes
   const startLocationValue = watch("startLocation");
@@ -221,24 +223,26 @@ const PublishForm = ({
       </div>
 
       {/* Fare Information */}
-      {calculateFare && (
         <div>
           <label className="block text-gray-700">Estimated Fare</label>
-          <div className="border rounded w-full p-2 bg-gray-50">
-            ₹{calculateFare.toFixed(2)}
-          </div>
+          <input
+          type="number"
+          {...register("price", { required: true,  })}
+          className="border rounded w-full p-2"
+          placeholder="Price"
+        />
         </div>
-      )}
-
-      {/* Route Description */}
-      {routeDescription && (
+  
         <div>
           <label className="block text-gray-700">Route Information</label>
-          <div className="border rounded w-full p-2 bg-gray-50">
-            {routeDescription}
-          </div>
+          <input
+          type="text"
+          {...register("routeDescription", { required: true, })}
+          className="border rounded w-full p-2"
+          placeholder="Route Details"
+        />
+
         </div>
-      )}
 
       {/* Submit Button */}
       <button 

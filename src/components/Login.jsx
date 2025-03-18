@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { FaGoogle } from "react-icons/fa";
 import { useForm } from "react-hook-form";
 import { useAuth } from "../context/AuthContext";
 
@@ -25,16 +24,7 @@ const Login = () => {
       console.error(error);
     }
   };
-  const handleGoogleSignIn = async () => {
-    try {
-      await signInWithGoogle();
-      alert("Login with Google successful!");
-      navigate("/"); // Redirect to home after successful login
-    } catch (error) {
-      setMessage("Google sign-in failed. Please try again.");
-      console.error(error);
-    }
-  };
+ 
 
   return (
     <div className="h-screen flex justify-center items-center bg-gray-100 px-4">
@@ -45,7 +35,7 @@ const Login = () => {
 
          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           {/* Email Input */}
-          {/* <div>
+           <div>
             <label className="block text-gray-700 text-sm font-semibold mb-1">
               Email
             </label>
@@ -61,7 +51,7 @@ const Login = () => {
           </div>
 
           {/* Password Input */}
-          {/* <div>
+          <div>
             <label className="block text-gray-700 text-sm font-semibold mb-1">
               Password
             </label>
@@ -74,27 +64,21 @@ const Login = () => {
             {errors.password && (
               <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>
             )}
-          </div> */}
+          </div>
 
           {/* Error Message */}
           {message && <p className="text-red-500 text-sm text-center">{message}</p>}
 
           {/* Login Button */}
-          {/* <button
+          <button
             type="submit"
             className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-md transition duration-200"
           >
             Login
-          </button>  */}
+          </button> 
 
           {/* Google Login Button */}
-          <button
-            type="button"
-            onClick={handleGoogleSignIn}
-            className="w-full flex items-center justify-center gap-2 bg-red-500 hover:bg-red-600 text-white font-semibold py-2 rounded-md transition duration-200"
-          >
-            <FaGoogle /> Sign in with Google
-          </button>
+       
         </form>
 
         {/* Register Link */}
