@@ -95,9 +95,7 @@ const Search = ({ onSearch }) => {
               
               // Generate description
               setRouteDescription(
-                `Route: ${startLocation} to ${endLocation} via ${route.name || 'custom route'}. ` +
-                `Total distance: ${(route.summary.totalDistance / 1000).toFixed(1)} km. ` +
-                `Estimated travel time: ${Math.round(route.summary.totalTime / 60)} minutes.`
+                `Route: ${startLocation} to ${endLocation} `
               );
             });
           }
