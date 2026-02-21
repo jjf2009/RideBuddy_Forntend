@@ -11,8 +11,17 @@ RideBuddy is a modern ride-sharing/carpooling web application that connects driv
 
 ---
 
+## 🎬 Demo Video
+
+[![RideBuddy Demo](https://img.youtube.com/vi/5uDTt0_T6NM/0.jpg)](https://www.youtube.com/watch?v=5uDTt0_T6NM)
+
+> Click the thumbnail above to watch the demo on YouTube.
+
+---
+
 ## 📑 Table of Contents
 
+- [Demo Video](#-demo-video)
 - [Features](#-features)
 - [Tech Stack](#-tech-stack)
 - [Project Structure](#-project-structure)
@@ -233,7 +242,9 @@ npm run preview
 
 ## 🌐 API Integration
 
-RideBuddy Frontend connects to a backend API hosted on Render:
+RideBuddy Frontend connects to a backend API hosted on Render.
+
+**Backend Repository:** [RideBuddy Backend](https://github.com/jjf2009/RideBuddy_Backend)
 
 **Base URL:** `https://ridebuddy-backend.onrender.com`
 
